@@ -32,30 +32,47 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .badge-active { background: #22c55e22; color: var(--green); }
 .badge-intake { background: #3b82f622; color: var(--accent); }
 .badge-complete { background: #71717a22; color: var(--muted); }
+.badge-assigned { background: #3b82f622; color: var(--accent); }
+.badge-in_progress { background: #eab30822; color: var(--yellow); }
+.badge-served { background: #22c55e22; color: var(--green); }
+.badge-failed { background: #ef444422; color: var(--red); }
+.badge-returned { background: #71717a22; color: var(--muted); }
 .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
 .toolbar h2 { font-size: 1.3rem; }
 .btn { background: var(--accent); color: #fff; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; }
 .btn:hover { opacity: 0.9; }
+.btn-sm { padding: 0.4rem 0.8rem; font-size: 0.75rem; }
+.filter-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+.filter-bar select { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 0.4rem 0.6rem; border-radius: 6px; font-size: 0.8rem; }
 /* Modal */
 .modal-bg { position: fixed; inset: 0; background: #000a; display: none; align-items: center; justify-content: center; z-index: 100; }
 .modal-bg.open { display: flex; }
-.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; width: 90%; max-width: 500px; }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
 .modal h3 { margin-bottom: 1rem; }
 .field { margin-bottom: 1rem; }
 .field label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 0.3rem; }
-.field input, .field select { width: 100%; padding: 0.5rem; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.9rem; }
+.field input, .field select, .field textarea { width: 100%; padding: 0.5rem; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.9rem; }
+.field textarea { min-height: 60px; resize: vertical; }
 /* Detail */
 .detail-header { margin-bottom: 2rem; }
 .detail-header h2 { font-size: 1.4rem; margin-bottom: 0.5rem; }
 .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
 .detail-section { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; }
 .detail-section h4 { color: var(--muted); font-size: 0.8rem; margin-bottom: 0.8rem; text-transform: uppercase; }
+.detail-section.full { grid-column: 1 / -1; }
 .note-item { padding: 0.6rem 0; border-bottom: 1px solid var(--border); }
 .note-item:last-child { border: none; }
 .note-item .note-meta { font-size: 0.75rem; color: var(--muted); }
 .note-input { display: flex; gap: 0.5rem; margin-top: 1rem; }
 .note-input input { flex: 1; padding: 0.5rem; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); }
 .back-btn { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 0.9rem; margin-bottom: 1rem; }
+.ev-item { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
+.ev-item:last-child { border: none; }
+.ev-item .ev-meta { font-size: 0.75rem; color: var(--muted); }
+.attempt-timeline { margin-top: 0.5rem; }
+.attempt-item { border-left: 3px solid var(--border); padding: 0.5rem 0 0.5rem 1rem; margin-bottom: 0.5rem; }
+.attempt-item.served { border-color: var(--green); }
+.attempt-item.refused { border-color: var(--red); }
 /* Auth */
 .auth-screen { display: flex; align-items: center; justify-content: center; height: 100vh; }
 .auth-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; text-align: center; }
@@ -77,6 +94,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <h1>GI Ops</h1>
     <button class="nav-btn active" onclick="showView('dashboard')">Dashboard</button>
     <button class="nav-btn" onclick="showView('cases')">Cases</button>
+    <button class="nav-btn" onclick="showView('serves')">Serves</button>
   </nav>
   <main class="main" id="content"></main>
 </div>
@@ -105,8 +123,29 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <select id="nc-priority"><option value="medium">Medium</option><option value="high">High</option><option value="low">Low</option></select>
     </div>
     <div style="display:flex;gap:0.5rem;justify-content:flex-end">
-      <button class="btn" style="background:var(--border)" onclick="closeModal()">Cancel</button>
+      <button class="btn" style="background:var(--border)" onclick="closeModal('modal-new')">Cancel</button>
       <button class="btn" onclick="createCase()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Serve Modal -->
+<div class="modal-bg" id="modal-serve">
+  <div class="modal">
+    <h3>New Serve Job</h3>
+    <div class="field"><label>Case</label>
+      <select id="ns-case"></select>
+    </div>
+    <div class="field"><label>Subject Name</label><input id="ns-name"></div>
+    <div class="field"><label>Address</label><input id="ns-address"></div>
+    <div class="field"><label>Description</label><input id="ns-desc"></div>
+    <div class="field"><label>Documents</label><textarea id="ns-docs" placeholder="Document descriptions..."></textarea></div>
+    <div class="field"><label>Assigned To</label>
+      <select id="ns-assigned"><option value="daniel">Daniel</option><option value="heidi">Heidi</option></select>
+    </div>
+    <div style="display:flex;gap:0.5rem;justify-content:flex-end">
+      <button class="btn" style="background:var(--border)" onclick="closeModal('modal-serve')">Cancel</button>
+      <button class="btn" onclick="createServe()">Create</button>
     </div>
   </div>
 </div>
@@ -114,8 +153,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <script src="config.js"></script>
 <script>
 let cases = [];
+let serves = [];
 let currentView = 'dashboard';
 let currentCase = null;
+let currentServe = null;
 
 // Auth
 if (!localStorage.getItem('gi_pin')) {
@@ -136,20 +177,24 @@ function doLogin() {
 async function boot() {
   document.getElementById('app').style.display = 'flex';
   cases = await api('/api/cases') || [];
+  serves = await api('/api/serves') || [];
   render();
 }
 
 function showView(v) {
   currentView = v;
   currentCase = null;
-  document.querySelectorAll('.nav-btn').forEach((b, i) => b.classList.toggle('active', (i === 0 && v === 'dashboard') || (i === 1 && v === 'cases')));
+  currentServe = null;
+  document.querySelectorAll('.nav-btn').forEach((b, i) => b.classList.toggle('active', (i === 0 && v === 'dashboard') || (i === 1 && v === 'cases') || (i === 2 && v === 'serves')));
   render();
 }
 
 function render() {
   const el = document.getElementById('content');
-  if (currentCase) { el.innerHTML = renderDetail(); return; }
+  if (currentCase) { el.innerHTML = renderCaseDetail(); return; }
+  if (currentServe) { el.innerHTML = renderServeDetail(); return; }
   if (currentView === 'dashboard') { el.innerHTML = renderDashboard(); return; }
+  if (currentView === 'serves') { el.innerHTML = renderServes(); return; }
   el.innerHTML = renderCases();
 }
 
@@ -157,13 +202,14 @@ function renderDashboard() {
   const active = cases.filter(c => c.status === 'active').length;
   const intake = cases.filter(c => c.status === 'intake').length;
   const complete = cases.filter(c => c.status === 'complete').length;
+  const pendingServes = serves.filter(s => s.status !== 'served' && s.status !== 'returned').length;
   return `
-    <div class="toolbar"><h2>Dashboard</h2><button class="btn" onclick="openModal()">+ New Case</button></div>
+    <div class="toolbar"><h2>Dashboard</h2><button class="btn" onclick="openNewCase()">+ New Case</button></div>
     <div class="stats">
       <div class="stat-card"><div class="label">Active Cases</div><div class="value" style="color:var(--green)">${active}</div></div>
       <div class="stat-card"><div class="label">Intake</div><div class="value" style="color:var(--accent)">${intake}</div></div>
       <div class="stat-card"><div class="label">Completed</div><div class="value">${complete}</div></div>
-      <div class="stat-card"><div class="label">Total</div><div class="value">${cases.length}</div></div>
+      <div class="stat-card"><div class="label">Pending Serves</div><div class="value" style="color:var(--yellow)">${pendingServes}</div></div>
     </div>
     <h3 style="margin-bottom:1rem">Recent Cases</h3>
     <div class="case-list">${cases.slice(0, 10).map(caseRow).join('')}</div>
@@ -172,8 +218,25 @@ function renderDashboard() {
 
 function renderCases() {
   return `
-    <div class="toolbar"><h2>All Cases</h2><button class="btn" onclick="openModal()">+ New Case</button></div>
+    <div class="toolbar"><h2>All Cases</h2><button class="btn" onclick="openNewCase()">+ New Case</button></div>
     <div class="case-list">${cases.map(caseRow).join('')}</div>
+  `;
+}
+
+function renderServes() {
+  return `
+    <div class="toolbar"><h2>Process Serves</h2><button class="btn" onclick="openNewServe()">+ New Serve</button></div>
+    <div class="filter-bar">
+      <select onchange="filterServes(this.value)">
+        <option value="">All Status</option>
+        <option value="assigned">Assigned</option>
+        <option value="in_progress">In Progress</option>
+        <option value="served">Served</option>
+        <option value="failed">Failed</option>
+        <option value="returned">Returned</option>
+      </select>
+    </div>
+    <div class="case-list" id="serves-list">${serves.map(serveRow).join('')}</div>
   `;
 }
 
@@ -185,9 +248,47 @@ function caseRow(c) {
   </div>`;
 }
 
-function renderDetail() {
+function serveRow(s) {
+  return `<div class="case-row" onclick="openServe('${s.id}')">
+    <div><div class="title">${s.subject.name || 'Unknown'}</div><div class="meta">${s.subject.address || 'No address'} · ${s.attempts.length} attempts · ${s.assigned_to}</div></div>
+    <span class="badge badge-${s.status}">${s.status.replace(/_/g,' ')}</span>
+  </div>`;
+}
+
+function filterServes(status) {
+  const filtered = status ? serves.filter(s => s.status === status) : serves;
+  document.getElementById('serves-list').innerHTML = filtered.map(serveRow).join('');
+}
+
+function renderCaseDetail() {
   const c = currentCase;
   const notes = (c.notes || []).map(n => `<div class="note-item"><div>${n.text}</div><div class="note-meta">${n.author} · ${new Date(n.at).toLocaleString()}</div></div>`).join('') || '<p style="color:var(--muted)">No notes yet</p>';
+
+  const evidence = (c._evidence || []).map(e => `
+    <div class="ev-item">
+      <div>
+        <div>${e.type}: ${e.filename || e.description}</div>
+        <div class="ev-meta">${e.captured_by} · ${new Date(e.captured_at).toLocaleString()}${e.gps && e.gps.lat ? ` · <a href="https://maps.google.com/?q=${e.gps.lat},${e.gps.lng}" target="_blank" style="color:var(--accent)">GPS</a>` : ''}</div>
+        <div class="ev-meta">Chain: ${(e.chain_of_custody || []).map(ch => ch.action + ' by ' + ch.by).join(' → ')}</div>
+      </div>
+    </div>
+  `).join('') || '<p style="color:var(--muted)">No evidence yet</p>';
+
+  const caseServes = serves.filter(s => s.case_id === c.id);
+  let servesSection = '';
+  if (c.type === 'process_serve' || caseServes.length > 0) {
+    const servesList = caseServes.map(s => `
+      <div class="ev-item" style="cursor:pointer" onclick="openServe('${s.id}')">
+        <div>
+          <div>${s.subject.name || 'Unknown'} — ${s.status.replace(/_/g,' ')}</div>
+          <div class="ev-meta">${s.attempts.length} attempts · ${s.assigned_to}</div>
+        </div>
+        <span class="badge badge-${s.status}">${s.status.replace(/_/g,' ')}</span>
+      </div>
+    `).join('') || '<p style="color:var(--muted)">No serves yet</p>';
+    servesSection = `<div class="detail-section full"><h4>Process Serves</h4>${servesList}</div>`;
+  }
+
   return `
     <button class="back-btn" onclick="showView('${currentView}')">← Back</button>
     <div class="detail-header">
@@ -204,13 +305,71 @@ function renderDetail() {
           ${['intake','active','pending_review','complete','closed'].map(s => `<option ${s===c.status?'selected':''}>${s}</option>`).join('')}
         </select>
       </div>
+      <div class="detail-section full"><h4>Evidence</h4>${evidence}</div>
+      ${servesSection}
+      <div class="detail-section full">
+        <h4>Notes</h4>
+        ${notes}
+        <div class="note-input">
+          <input id="note-text" placeholder="Add a note...">
+          <button class="btn btn-sm" onclick="addNote('${c.id}')">Add</button>
+        </div>
+      </div>
     </div>
-    <div class="detail-section">
-      <h4>Notes</h4>
-      ${notes}
-      <div class="note-input">
-        <input id="note-text" placeholder="Add a note...">
-        <button class="btn" onclick="addNote('${c.id}')">Add</button>
+  `;
+}
+
+function renderServeDetail() {
+  const s = currentServe;
+  const attempts = s.attempts.map(a => `
+    <div class="attempt-item ${a.result}">
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-weight:600">${a.result.replace(/_/g,' ')}</span>
+        <span class="ev-meta">${new Date(a.at).toLocaleString()}</span>
+      </div>
+      ${a.notes ? `<p style="margin-top:0.3rem;font-size:0.85rem">${a.notes}</p>` : ''}
+      ${a.gps && a.gps.lat ? `<a href="https://maps.google.com/?q=${a.gps.lat},${a.gps.lng}" target="_blank" style="color:var(--accent);font-size:0.75rem">View on Map</a>` : ''}
+    </div>
+  `).join('') || '<p style="color:var(--muted)">No attempts yet</p>';
+
+  return `
+    <button class="back-btn" onclick="showView('serves')">← Back</button>
+    <div class="detail-header">
+      <h2>Serve: ${s.subject.name || 'Unknown'}</h2>
+      <span class="badge badge-${s.status}">${s.status.replace(/_/g,' ')}</span>
+      <span style="color:var(--muted);margin-left:1rem">Assigned to ${s.assigned_to}</span>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-section">
+        <h4>Subject</h4>
+        <p>${s.subject.name}</p>
+        <p style="color:var(--muted)">${s.subject.address}</p>
+        <p style="color:var(--muted)">${s.subject.description}</p>
+      </div>
+      <div class="detail-section">
+        <h4>Details</h4>
+        <p><strong>Documents:</strong> ${s.documents || 'N/A'}</p>
+        <p><strong>Mileage:</strong> ${s.mileage.total || 0} mi</p>
+        ${s.served_at ? `<p><strong>Served at:</strong> ${new Date(s.served_at).toLocaleString()}</p>` : ''}
+        ${s.served_gps && s.served_gps.lat ? `<p><a href="https://maps.google.com/?q=${s.served_gps.lat},${s.served_gps.lng}" target="_blank" style="color:var(--accent)">Served Location</a></p>` : ''}
+      </div>
+      <div class="detail-section">
+        <h4>Status</h4>
+        <select onchange="updateServeStatus('${s.id}', this.value)" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.4rem;border-radius:4px">
+          ${['assigned','in_progress','served','failed','returned'].map(st => `<option ${st===s.status?'selected':''}>${st}</option>`).join('')}
+        </select>
+      </div>
+      <div class="detail-section">
+        <h4>Mileage</h4>
+        <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
+          <input id="mile-start" type="number" placeholder="Start" value="${s.mileage.start||''}" style="width:80px;padding:0.3rem;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text)">
+          <input id="mile-end" type="number" placeholder="End" value="${s.mileage.end||''}" style="width:80px;padding:0.3rem;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text)">
+          <button class="btn btn-sm" onclick="updateMileage('${s.id}')">Save</button>
+        </div>
+      </div>
+      <div class="detail-section full">
+        <h4>Attempts Timeline</h4>
+        <div class="attempt-timeline">${attempts}</div>
       </div>
     </div>
   `;
@@ -218,6 +377,16 @@ function renderDetail() {
 
 async function openCase(id) {
   currentCase = await api(`/api/cases/${id}`);
+  // Load evidence for this case
+  const ev = await api(`/api/cases/${id}/evidence`) || [];
+  currentCase._evidence = ev;
+  render();
+}
+
+async function openServe(id) {
+  currentServe = await api(`/api/serves/${id}`);
+  currentView = 'serves';
+  currentCase = null;
   render();
 }
 
@@ -225,6 +394,24 @@ async function updateStatus(id, status) {
   await api(`/api/cases/${id}`, { method: 'PATCH', body: { status } });
   cases = await api('/api/cases');
   currentCase = await api(`/api/cases/${id}`);
+  const ev = await api(`/api/cases/${id}/evidence`) || [];
+  currentCase._evidence = ev;
+  render();
+}
+
+async function updateServeStatus(id, status) {
+  await api(`/api/serves/${id}`, { method: 'PATCH', body: { status } });
+  serves = await api('/api/serves') || [];
+  currentServe = await api(`/api/serves/${id}`);
+  render();
+}
+
+async function updateMileage(id) {
+  const start = parseFloat(document.getElementById('mile-start').value) || 0;
+  const end = parseFloat(document.getElementById('mile-end').value) || 0;
+  await api(`/api/serves/${id}`, { method: 'PATCH', body: { mileage: { start, end, total: Math.max(0, end - start) } } });
+  serves = await api('/api/serves') || [];
+  currentServe = await api(`/api/serves/${id}`);
   render();
 }
 
@@ -233,11 +420,18 @@ async function addNote(id) {
   if (!text) return;
   await api(`/api/cases/${id}/notes`, { method: 'POST', body: { text, author: 'daniel' } });
   currentCase = await api(`/api/cases/${id}`);
+  const ev = await api(`/api/cases/${id}/evidence`) || [];
+  currentCase._evidence = ev;
   render();
 }
 
-function openModal() { document.getElementById('modal-new').classList.add('open'); }
-function closeModal() { document.getElementById('modal-new').classList.remove('open'); }
+function openNewCase() { document.getElementById('modal-new').classList.add('open'); }
+function openNewServe() {
+  const sel = document.getElementById('ns-case');
+  sel.innerHTML = cases.map(c => `<option value="${c.id}">${c.title}</option>`).join('');
+  document.getElementById('modal-serve').classList.add('open');
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 async function createCase() {
   const body = {
@@ -251,7 +445,25 @@ async function createCase() {
   if (!body.title) return;
   await api('/api/cases', { method: 'POST', body });
   cases = await api('/api/cases');
-  closeModal();
+  closeModal('modal-new');
+  render();
+}
+
+async function createServe() {
+  const body = {
+    case_id: document.getElementById('ns-case').value,
+    subject: {
+      name: document.getElementById('ns-name').value,
+      address: document.getElementById('ns-address').value,
+      description: document.getElementById('ns-desc').value,
+    },
+    documents: document.getElementById('ns-docs').value,
+    assigned_to: document.getElementById('ns-assigned').value,
+  };
+  if (!body.case_id) return;
+  await api('/api/serves', { method: 'POST', body });
+  serves = await api('/api/serves') || [];
+  closeModal('modal-serve');
   render();
 }
 </script>

@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .cases import router as cases_router
+from .evidence import router as evidence_router
+from .serves import router as serves_router
 
 app = FastAPI(title="Grande Investigations API")
 
@@ -12,6 +14,8 @@ app.add_middleware(
 )
 
 app.include_router(cases_router)
+app.include_router(evidence_router)
+app.include_router(serves_router)
 
 
 @app.get("/api/health")
