@@ -1,0 +1,8 @@
+{
+  "name": "Grande Investigations",
+  "short_name": "GI Desk",
+  "start_url": "/desk.html",
+  "display": "standalone",
+  "background_color": "#0f1117",
+  "theme_color": "#3b82f6"
+}

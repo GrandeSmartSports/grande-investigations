@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grande Investigations — Desk</title>
+<link rel="manifest" href="manifest-desk.json">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0f1117; --surface: #1a1d27; --border: #2a2d3a;
+  --text: #e4e4e7; --muted: #71717a; --accent: #3b82f6;
+  --green: #22c55e; --yellow: #eab308; --red: #ef4444;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+.app { display: flex; height: 100vh; }
+.sidebar { width: 220px; background: var(--surface); border-right: 1px solid var(--border); padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.sidebar h1 { font-size: 0.9rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; }
+.nav-btn { background: none; border: none; color: var(--text); padding: 0.6rem 0.8rem; border-radius: 6px; cursor: pointer; text-align: left; font-size: 0.9rem; }
+.nav-btn:hover, .nav-btn.active { background: var(--border); }
+.main { flex: 1; overflow-y: auto; padding: 2rem; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; }
+.stat-card .label { color: var(--muted); font-size: 0.8rem; }
+.stat-card .value { font-size: 1.8rem; font-weight: 700; margin-top: 0.3rem; }
+.case-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.case-row { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.2rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.case-row:hover { border-color: var(--accent); }
+.case-row .title { font-weight: 500; }
+.case-row .meta { color: var(--muted); font-size: 0.8rem; }
+.badge { padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+.badge-active { background: #22c55e22; color: var(--green); }
+.badge-intake { background: #3b82f622; color: var(--accent); }
+.badge-complete { background: #71717a22; color: var(--muted); }
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.toolbar h2 { font-size: 1.3rem; }
+.btn { background: var(--accent); color: #fff; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; }
+.btn:hover { opacity: 0.9; }
+/* Modal */
+.modal-bg { position: fixed; inset: 0; background: #000a; display: none; align-items: center; justify-content: center; z-index: 100; }
+.modal-bg.open { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; width: 90%; max-width: 500px; }
+.modal h3 { margin-bottom: 1rem; }
+.field { margin-bottom: 1rem; }
+.field label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 0.3rem; }
+.field input, .field select { width: 100%; padding: 0.5rem; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.9rem; }
+/* Detail */
+.detail-header { margin-bottom: 2rem; }
+.detail-header h2 { font-size: 1.4rem; margin-bottom: 0.5rem; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+.detail-section { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; }
+.detail-section h4 { color: var(--muted); font-size: 0.8rem; margin-bottom: 0.8rem; text-transform: uppercase; }
+.note-item { padding: 0.6rem 0; border-bottom: 1px solid var(--border); }
+.note-item:last-child { border: none; }
+.note-item .note-meta { font-size: 0.75rem; color: var(--muted); }
+.note-input { display: flex; gap: 0.5rem; margin-top: 1rem; }
+.note-input input { flex: 1; padding: 0.5rem; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); }
+.back-btn { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 0.9rem; margin-bottom: 1rem; }
+/* Auth */
+.auth-screen { display: flex; align-items: center; justify-content: center; height: 100vh; }
+.auth-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; text-align: center; }
+.auth-box input { margin: 1rem 0; padding: 0.7rem; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 1.2rem; text-align: center; letter-spacing: 0.3em; width: 160px; }
+</style>
+</head>
+<body>
+<div id="auth" class="auth-screen" style="display:none">
+  <div class="auth-box">
+    <h2>Grande Investigations</h2>
+    <p style="color:var(--muted);margin-top:0.5rem">Enter PIN</p>
+    <input type="password" id="pin-input" maxlength="6" autofocus>
+    <br><button class="btn" onclick="doLogin()">Enter</button>
+  </div>
+</div>
+
+<div id="app" class="app" style="display:none">
+  <nav class="sidebar">
+    <h1>GI Ops</h1>
+    <button class="nav-btn active" onclick="showView('dashboard')">Dashboard</button>
+    <button class="nav-btn" onclick="showView('cases')">Cases</button>
+  </nav>
+  <main class="main" id="content"></main>
+</div>
+
+<!-- New Case Modal -->
+<div class="modal-bg" id="modal-new">
+  <div class="modal">
+    <h3>New Case</h3>
+    <div class="field"><label>Title</label><input id="nc-title"></div>
+    <div class="field"><label>Type</label>
+      <select id="nc-type">
+        <option value="background_check">Background Check</option>
+        <option value="process_serve">Process Serve</option>
+        <option value="skip_trace">Skip Trace</option>
+        <option value="surveillance">Surveillance</option>
+        <option value="insurance_fraud">Insurance Fraud</option>
+        <option value="lnc_review">LNC Review</option>
+      </select>
+    </div>
+    <div class="field"><label>Client Name</label><input id="nc-client"></div>
+    <div class="field"><label>Subject Name</label><input id="nc-subject"></div>
+    <div class="field"><label>Assigned To</label>
+      <select id="nc-assigned"><option value="daniel">Daniel</option><option value="heidi">Heidi</option></select>
+    </div>
+    <div class="field"><label>Priority</label>
+      <select id="nc-priority"><option value="medium">Medium</option><option value="high">High</option><option value="low">Low</option></select>
+    </div>
+    <div style="display:flex;gap:0.5rem;justify-content:flex-end">
+      <button class="btn" style="background:var(--border)" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="createCase()">Create</button>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+let cases = [];
+let currentView = 'dashboard';
+let currentCase = null;
+
+// Auth
+if (!localStorage.getItem('gi_pin')) {
+  document.getElementById('auth').style.display = 'flex';
+} else {
+  boot();
+}
+
+function doLogin() {
+  const pin = document.getElementById('pin-input').value;
+  if (pin) {
+    localStorage.setItem('gi_pin', pin);
+    document.getElementById('auth').style.display = 'none';
+    boot();
+  }
+}
+
+async function boot() {
+  document.getElementById('app').style.display = 'flex';
+  cases = await api('/api/cases') || [];
+  render();
+}
+
+function showView(v) {
+  currentView = v;
+  currentCase = null;
+  document.querySelectorAll('.nav-btn').forEach((b, i) => b.classList.toggle('active', (i === 0 && v === 'dashboard') || (i === 1 && v === 'cases')));
+  render();
+}
+
+function render() {
+  const el = document.getElementById('content');
+  if (currentCase) { el.innerHTML = renderDetail(); return; }
+  if (currentView === 'dashboard') { el.innerHTML = renderDashboard(); return; }
+  el.innerHTML = renderCases();
+}
+
+function renderDashboard() {
+  const active = cases.filter(c => c.status === 'active').length;
+  const intake = cases.filter(c => c.status === 'intake').length;
+  const complete = cases.filter(c => c.status === 'complete').length;
+  return `
+    <div class="toolbar"><h2>Dashboard</h2><button class="btn" onclick="openModal()">+ New Case</button></div>
+    <div class="stats">
+      <div class="stat-card"><div class="label">Active Cases</div><div class="value" style="color:var(--green)">${active}</div></div>
+      <div class="stat-card"><div class="label">Intake</div><div class="value" style="color:var(--accent)">${intake}</div></div>
+      <div class="stat-card"><div class="label">Completed</div><div class="value">${complete}</div></div>
+      <div class="stat-card"><div class="label">Total</div><div class="value">${cases.length}</div></div>
+    </div>
+    <h3 style="margin-bottom:1rem">Recent Cases</h3>
+    <div class="case-list">${cases.slice(0, 10).map(caseRow).join('')}</div>
+  `;
+}
+
+function renderCases() {
+  return `
+    <div class="toolbar"><h2>All Cases</h2><button class="btn" onclick="openModal()">+ New Case</button></div>
+    <div class="case-list">${cases.map(caseRow).join('')}</div>
+  `;
+}
+
+function caseRow(c) {
+  const badge = c.status === 'active' ? 'badge-active' : c.status === 'intake' ? 'badge-intake' : 'badge-complete';
+  return `<div class="case-row" onclick="openCase('${c.id}')">
+    <div><div class="title">${c.title}</div><div class="meta">${c.type.replace(/_/g,' ')} · ${c.assigned_to}</div></div>
+    <span class="badge ${badge}">${c.status}</span>
+  </div>`;
+}
+
+function renderDetail() {
+  const c = currentCase;
+  const notes = (c.notes || []).map(n => `<div class="note-item"><div>${n.text}</div><div class="note-meta">${n.author} · ${new Date(n.at).toLocaleString()}</div></div>`).join('') || '<p style="color:var(--muted)">No notes yet</p>';
+  return `
+    <button class="back-btn" onclick="showView('${currentView}')">← Back</button>
+    <div class="detail-header">
+      <h2>${c.title}</h2>
+      <span class="badge badge-${c.status === 'active' ? 'active' : c.status === 'intake' ? 'intake' : 'complete'}">${c.status}</span>
+      <span style="color:var(--muted);margin-left:1rem">${c.type.replace(/_/g,' ')} · ${c.priority} priority · ${c.assigned_to}</span>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-section"><h4>Client</h4><p>${c.client.name || 'N/A'}</p><p style="color:var(--muted)">${c.client.email} ${c.client.phone}</p><p style="color:var(--muted)">${c.client.company}</p></div>
+      <div class="detail-section"><h4>Subject</h4><p>${c.subject.name || 'N/A'}</p><p style="color:var(--muted)">${c.subject.last_known_address}</p></div>
+      <div class="detail-section"><h4>Billing</h4><p>${c.billing.rate_type} · $${c.billing.rate}/hr</p><p style="color:var(--muted)">${c.billing.hours} hours logged</p></div>
+      <div class="detail-section"><h4>Status</h4>
+        <select onchange="updateStatus('${c.id}', this.value)" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.4rem;border-radius:4px">
+          ${['intake','active','pending_review','complete','closed'].map(s => `<option ${s===c.status?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>Notes</h4>
+      ${notes}
+      <div class="note-input">
+        <input id="note-text" placeholder="Add a note...">
+        <button class="btn" onclick="addNote('${c.id}')">Add</button>
+      </div>
+    </div>
+  `;
+}
+
+async function openCase(id) {
+  currentCase = await api(`/api/cases/${id}`);
+  render();
+}
+
+async function updateStatus(id, status) {
+  await api(`/api/cases/${id}`, { method: 'PATCH', body: { status } });
+  cases = await api('/api/cases');
+  currentCase = await api(`/api/cases/${id}`);
+  render();
+}
+
+async function addNote(id) {
+  const text = document.getElementById('note-text').value;
+  if (!text) return;
+  await api(`/api/cases/${id}/notes`, { method: 'POST', body: { text, author: 'daniel' } });
+  currentCase = await api(`/api/cases/${id}`);
+  render();
+}
+
+function openModal() { document.getElementById('modal-new').classList.add('open'); }
+function closeModal() { document.getElementById('modal-new').classList.remove('open'); }
+
+async function createCase() {
+  const body = {
+    title: document.getElementById('nc-title').value,
+    type: document.getElementById('nc-type').value,
+    client: { name: document.getElementById('nc-client').value, email: '', phone: '', company: '' },
+    subject: { name: document.getElementById('nc-subject').value, aliases: [], dob: '', last_known_address: '' },
+    assigned_to: document.getElementById('nc-assigned').value,
+    priority: document.getElementById('nc-priority').value,
+  };
+  if (!body.title) return;
+  await api('/api/cases', { method: 'POST', body });
+  cases = await api('/api/cases');
+  closeModal();
+  render();
+}
+</script>
+</body>
+</html>
