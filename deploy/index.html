@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grande Investigations — The Proposal</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #0a0a0a;
+    color: #e8e8e8;
+    line-height: 1.7;
+  }
+
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 24px;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(220, 38, 38, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(59, 130, 246, 0.06) 0%, transparent 50%);
+    animation: pulse 8s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  .hero-content { position: relative; z-index: 1; max-width: 800px; }
+
+  .hero h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+
+  .hero h1 span { color: #dc2626; }
+
+  .hero .tagline {
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    color: #888;
+    font-weight: 300;
+    margin-bottom: 40px;
+  }
+
+  .hero .big-stat {
+    display: inline-flex;
+    gap: 48px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .hero .stat-item {
+    text-align: center;
+  }
+
+  .hero .stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #dc2626;
+    display: block;
+  }
+
+  .hero .stat-label {
+    font-size: 0.85rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 80px 24px;
+  }
+
+  h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 32px;
+    letter-spacing: -1px;
+  }
+
+  h2 span { color: #dc2626; }
+
+  h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 32px 0 16px;
+    color: #fff;
+  }
+
+  p { margin-bottom: 16px; color: #bbb; }
+
+  .highlight { color: #fff; font-weight: 600; }
+  .red { color: #dc2626; }
+  .green { color: #22c55e; }
+  .blue { color: #3b82f6; }
+
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #333, transparent);
+    margin: 0;
+  }
+
+  /* Cards */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin: 24px 0;
+  }
+
+  .card {
+    background: #141414;
+    border: 1px solid #222;
+    border-radius: 12px;
+    padding: 28px;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: #dc2626; }
+
+  .card .card-icon {
+    font-size: 2rem;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .card h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+
+  .card p { font-size: 0.9rem; color: #888; margin: 0; }
+
+  /* Comparison Table */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+  }
+
+  .compare-table th {
+    text-align: left;
+    padding: 14px 16px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #666;
+    border-bottom: 1px solid #222;
+  }
+
+  .compare-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #1a1a1a;
+    color: #bbb;
+  }
+
+  .compare-table tr:hover td { background: #111; }
+
+  .compare-table .label { color: #fff; font-weight: 600; }
+  .compare-table .bad { color: #ef4444; }
+  .compare-table .good { color: #22c55e; }
+
+  /* Phase Cards */
+  .phase {
+    background: #111;
+    border-left: 4px solid #dc2626;
+    border-radius: 0 12px 12px 0;
+    padding: 32px;
+    margin: 24px 0;
+  }
+
+  .phase.phase-2 { border-left-color: #f59e0b; }
+  .phase.phase-3 { border-left-color: #22c55e; }
+  .phase.phase-4 { border-left-color: #3b82f6; }
+
+  .phase .phase-tag {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #dc2626;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .phase.phase-2 .phase-tag { color: #f59e0b; }
+  .phase.phase-3 .phase-tag { color: #22c55e; }
+  .phase.phase-4 .phase-tag { color: #3b82f6; }
+
+  .phase h3 { margin-top: 0; }
+
+  .phase .milestone {
+    background: #1a1a1a;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 16px;
+    border: 1px solid #252525;
+  }
+
+  .phase .milestone strong {
+    color: #fff;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .phase .milestone p { margin: 0; font-size: 0.9rem; }
+
+  /* Task List */
+  .tasks {
+    list-style: none;
+    margin: 16px 0;
+  }
+
+  .tasks li {
+    padding: 10px 0;
+    border-bottom: 1px solid #1a1a1a;
+    color: #bbb;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .tasks li::before {
+    content: '>';
+    color: #dc2626;
+    font-weight: 700;
+    font-family: monospace;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* Source Citations */
+  .source {
+    font-size: 0.75rem;
+    color: #555;
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  .source a { color: #555; text-decoration: underline; }
+  .source a:hover { color: #888; }
+
+  /* CTA */
+  .cta-section {
+    text-align: center;
+    padding: 100px 24px;
+    background: linear-gradient(135deg, #1a0a0a, #0a0a0a, #0a0a1a);
+  }
+
+  .cta-section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 16px;
+  }
+
+  .cta-section p {
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto 40px;
+    color: #888;
+  }
+
+  /* Pros/Cons */
+  .pros-cons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 24px 0;
+  }
+
+  @media (max-width: 600px) {
+    .pros-cons { grid-template-columns: 1fr; }
+  }
+
+  .pros-cons .col h4 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+
+  .pros-cons .col.pro h4 { color: #22c55e; }
+  .pros-cons .col.con h4 { color: #ef4444; }
+
+  .pros-cons ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .pros-cons li {
+    padding: 8px 0;
+    border-bottom: 1px solid #1a1a1a;
+    font-size: 0.9rem;
+    color: #999;
+  }
+
+  /* Income Callout */
+  .income-callout {
+    background: linear-gradient(135deg, #1a0505, #0a0a0a);
+    border: 1px solid #dc2626;
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    margin: 40px 0;
+  }
+
+  .income-callout .amount {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #dc2626;
+  }
+
+  .income-callout .context {
+    color: #888;
+    font-size: 1rem;
+  }
+
+  .footnote {
+    font-size: 0.75rem;
+    color: #444;
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== HERO ========== -->
+<div class="hero">
+  <div class="hero-content">
+    <h1>GRANDE <span>INVESTIGATIONS</span></h1>
+    <p class="tagline">A career that puts you home. A business built on what you're already great at.</p>
+    <div class="big-stat">
+      <div class="stat-item">
+        <span class="stat-number">#1</span>
+        <span class="stat-label">WA is the highest-paying state for PIs</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">$200</span>
+        <span class="stat-label">Total cost to get licensed</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">75%</span>
+        <span class="stat-label">Of the work is from a desk at home</span>
+      </div>
+    </div>
+    <p class="source">PI salary: <a href="https://www.salary.com/research/salary/alternate/private-investigator-salary/wa">Salary.com WA</a> |
+    License: <a href="https://dol.wa.gov/professional-licenses/private-investigators/get-your-license-private-investigators-unarmed">WA Dept of Licensing</a></p>
+  </div>
+</div>
+
+<!-- ========== THE PROBLEM ========== -->
+<section>
+  <h2>The <span>Problem</span></h2>
+  <p>14 twelve-hour shifts a month. Always gone. Missing games, missing dinners, missing bedtimes. High stress. Someone else's schedule. A $30K degree that was supposed to open doors but instead chained you to a job you hate.</p>
+  <p class="highlight" style="font-size:1.2rem; margin-top:24px;">What if the answer was already in front of you?</p>
+  <p>The eviction case proved something. The research, the digging, the building of a case from scattered evidence — that wasn't work. That was <span class="highlight">a calling you didn't know you had.</span></p>
+</section>
+
+<div class="divider"></div>
+
+<!-- ========== WHY THIS WORKS ========== -->
+<section>
+  <h2>Why This <span>Works</span></h2>
+
+  <h3>Heidi's Unfair Advantages</h3>
+  <div class="card-grid">
+    <div class="card">
+      <span class="card-icon">🔍</span>
+      <h4>Natural Researcher</h4>
+      <p>With nothing but a Windows laptop and Google, you find things as fast as professional tools. That instinct IS the job.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🏥</span>
+      <h4>Medical Background</h4>
+      <p>15+ years in nursing means you can read medical records, spot injury inconsistencies, and understand clinical decisions. Insurance companies pay premium rates for this.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🛡️</span>
+      <h4>NP/Master's Credential</h4>
+      <p>That $30K degree? It qualifies you as an expert witness at $300-500/hour. The degree pays for itself.</p>
+      <p class="source"><a href="https://www.legalnurse.com/certified-legal-nurse-consultants/clnc-consultant-stories/i-am-living-my-passion-in-tennessee-making-175000-this-year-as-a-certified-legal-nurse-consultant">Source: LegalNurse.com — LNC earning $175K</a></p>
+    </div>
+    <div class="card">
+      <span class="card-icon">💻</span>
+      <h4>Daniel = The Tech</h4>
+      <p>Case management systems, OSINT tools, client portals, automated reports — Daniel builds the technology. You focus on the work.</p>
+    </div>
+  </div>
+
+  <h3>Daniel + Heidi = A Complete PI Firm</h3>
+  <p><span class="highlight">Heidi</span> does the investigations — skip tracing, background research, surveillance analysis, medical record review, witness interviews.</p>
+  <p><span class="highlight">Daniel</span> builds the systems — case management, evidence tracking, client portal, billing, OSINT automation. And gets licensed too so you can work cases together.</p>
+  <p>Most PI firms have one or the other. You have both. That's rare.</p>
+</section>
+
+<div class="divider"></div>
+
+<!-- ========== WA LICENSE ========== -->
+<section>
+  <h2>Getting <span>Licensed</span> in Washington</h2>
+  <p>Washington State has one of the most straightforward PI licensing processes in the country.</p>
+
+  <table class="compare-table">
+    <tr>
+      <th>Requirement</th>
+      <th>Washington</th>
+    </tr>
+    <tr>
+      <td class="label">Minimum Age</td>
+      <td>18 (21 for armed)</td>
+    </tr>
+    <tr>
+      <td class="label">Required Experience</td>
+      <td class="good">None for unarmed PI</td>
+    </tr>
+    <tr>
+      <td class="label">Training</td>
+      <td>4-hour pre-assignment course</td>
+    </tr>
+    <tr>
+      <td class="label">Exam</td>
+      <td>Short test after training (not a state board exam)</td>
+    </tr>
+    <tr>
+      <td class="label">Background Check</td>
+      <td>Fingerprint-based FBI/state check</td>
+    </tr>
+    <tr>
+      <td class="label">Employment</td>
+      <td>Must have job offer from a licensed agency</td>
+    </tr>
+    <tr>
+      <td class="label">Cost</td>
+      <td class="good">$200 application fee</td>
+    </tr>
+    <tr>
+      <td class="label">Timeline to Licensed</td>
+      <td class="good">Weeks, not months or years</td>
+    </tr>
+  </table>
+  <p class="source">Source: <a href="https://dol.wa.gov/professional-licenses/private-investigators/get-your-license-private-investigators-unarmed">Washington State Department of Licensing — Private Investigators</a> |
+  <a href="https://app.leg.wa.gov/rcw/default.aspx?cite=18.165&full=true">RCW 18.165</a></p>
+
+  <p style="margin-top:24px;">To open your <span class="highlight">own agency</span> later, you'll need to meet additional requirements. But to start working and earning? <span class="highlight">A 4-hour course, $200, and a job offer.</span></p>
+</section>
+
+<div class="divider"></div>
+
+<!-- ========== THE WORK ========== -->
+<section>
+  <h2>What the <span>Work</span> Looks Like</h2>
+  <p>This is not what you see on TV. Most modern PI work is research, databases, and reports. Especially the niches that fit Heidi.</p>
+
+  <h3>Heidi's Sweet Spot: Finding People & Digging Deep</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Skip Tracing & Locates</h4>
+      <p>Find people who don't want to be found. Deadbeat parents, missing witnesses, heirs to estates, defendants dodging lawsuits. Databases, public records, social media, OSINT.</p>
+      <p style="color:#22c55e; margin-top:8px; font-weight:600;">$75-150/simple locate | $500-2,000+ complex</p>
+    </div>
+    <div class="card">
+      <h4>Background Investigations</h4>
+      <p>Pre-employment screening. Tenant checks. Business due diligence. You literally just dealt with a bad property manager — you know why this matters.</p>
+      <p style="color:#22c55e; margin-top:8px; font-weight:600;">$200-500 per report</p>
+    </div>
+    <div class="card">
+      <h4>Insurance & Workers Comp</h4>
+      <p>Verify injury claims for insurance companies. Your nursing background means you know what real injuries look like. Mostly medical record review + social media analysis.</p>
+      <p style="color:#22c55e; margin-top:8px; font-weight:600;">$65-100/hour</p>
+      <p class="source"><a href="https://www.salary.com/research/salary/posting/healthcare-fraud-investigator-salary">Salary.com</a></p>
+    </div>
+    <div class="card">
+      <h4>Process Serving</h4>
+      <p>Deliver legal documents. $40-75 per serve, stack 5-10 in a day. Easy money, builds attorney relationships, learns the legal system.</p>
+      <p style="color:#22c55e; margin-top:8px; font-weight:600;">$40-75 per serve</p>
+    </div>
+  </div>
+
+  <h3>What Each Job Actually Looks Like</h3>
+  <p>No vague descriptions. Here's exactly what you'd do, step by step, for each type of work.</p>
+
+  <div class="phase" style="border-left-color:#3b82f6;">
+    <div class="phase-tag" style="color:#3b82f6;">Background Checks — The Bread & Butter</div>
+    <h3>What You Get</h3>
+    <p>A name, DOB, maybe a SSN last-4, and what the client needs to know — employment history? Criminal? Financial? All of the above?</p>
+    <h3>What You Actually Do</h3>
+    <ul class="tasks">
+      <li>Log into investigative databases (Tracers, TLOxp, IRBSearch — $100-300/month subscription)</li>
+      <li>Pull records: criminal history (federal + state + county), civil suits, liens, judgments, bankruptcies, sex offender registries, professional licenses</li>
+      <li>Cross-reference: verify employment history, education credentials, address history</li>
+      <li>Check social media — public posts, photos, associations, lifestyle vs. claims</li>
+      <li>Sometimes call former employers or references to verify claims</li>
+      <li>Write a clean report summarizing findings</li>
+    </ul>
+    <div class="milestone">
+      <strong>Time per case:</strong>
+      <p>2-4 hours for a standard background check</p>
+    </div>
+    <div class="milestone" style="margin-top:8px;">
+      <strong>What you earn:</strong>
+      <p>$300-800 per check depending on depth. Through an agency: <span class="green">$150-400 per case or $50-75/hr</span></p>
+    </div>
+    <p style="margin-top:16px; color:#888; font-style:italic;">This is the puzzle-solving Heidi loved in the eviction case — piecing together who someone really is from scattered data points.</p>
+  </div>
+
+  <div class="phase" style="border-left-color:#8b5cf6;">
+    <div class="phase-tag" style="color:#8b5cf6;">Skip Tracing — Finding People Who Don't Want to Be Found</div>
+    <h3>What You Get</h3>
+    <p>A name, last known address, maybe some old contact info. The person owes money, skipped bail, is a missing heir, or is a witness needed for a case.</p>
+    <h3>What You Actually Do</h3>
+    <ul class="tasks">
+      <li>Database searches — address history, phone records, utility connections, property records</li>
+      <li>Social media deep-dive — who are they connected to? Whose photos are they tagged in? What locations are geotagged?</li>
+      <li>Public records — voter registration, vehicle registration, professional licenses (people forget to update these)</li>
+      <li>Associate analysis — find their family and friends, check <em>their</em> records for connections back to the subject</li>
+      <li>Sometimes a pretext call (legal) to verify they're at the located address</li>
+      <li>Deliver the located address/phone with a confidence rating and supporting evidence</li>
+    </ul>
+    <div class="milestone">
+      <strong>Time per case:</strong>
+      <p>1-6 hours depending on difficulty</p>
+    </div>
+    <div class="milestone" style="margin-top:8px;">
+      <strong>What you earn:</strong>
+      <p>$300-800 basic. $2,500-10,000 for complex missing person cases. Agency cut: <span class="green">$150-500 per locate or hourly</span></p>
+    </div>
+    <p style="margin-top:16px; color:#888; font-style:italic;">This is literally what Heidi did with the eviction tenant. Found the real identity, connected the dots, traced the person. She already knows how to do this.</p>
+  </div>
+
+  <div class="phase" style="border-left-color:#dc2626;">
+    <div class="phase-tag" style="color:#dc2626;">Insurance Fraud / SIU — Where Heidi's Medical Background Is Gold</div>
+    <h3>Why This Is Heidi's Money Niche</h3>
+    <p>Insurance companies desperately need investigators who can <span class="highlight">read medical records and spot what doesn't add up.</span> Most PIs can't do this. Heidi can. Insurance fraud costs the industry $80+ billion a year — they pay real money for someone who can read the charts and explain why a claim is inconsistent.</p>
+    <h3>What You Get</h3>
+    <p>A claim file — claimant says they're injured, can't work, needs surgery. Something flagged it as suspicious and the insurance company needs someone who understands medicine to review it.</p>
+    <h3>What You Actually Do</h3>
+    <ul class="tasks">
+      <li>Review medical records — do the treatment notes match the claimed injury? Are the billing codes appropriate? Is the provider ordering unnecessary procedures?</li>
+      <li>Check provider history — has this doctor been flagged before? Pattern of suspicious claims from the same clinic?</li>
+      <li>Cross-reference activity — claimant says they can't lift 10 lbs but their social media shows them at CrossFit</li>
+      <li>Write a medical opinion summary explaining what's clinically inconsistent</li>
+      <li>Sometimes paired with a surveillance investigator who gets the video while you do the medical analysis</li>
+    </ul>
+    <div class="milestone">
+      <strong>Time per case:</strong>
+      <p>4-10 hours for medical record review</p>
+    </div>
+    <div class="milestone" style="margin-top:8px;">
+      <strong>What Heidi could earn:</strong>
+      <p>Through an agency as clinical fraud investigator: <span class="green">$65,000-$125,000/year</span><br>
+      As 1099 contractor with medical expertise: <span class="green">$75-150/hr</span><br>
+      Combined with Legal Nurse Consulting: <span class="green">$125-200/hr</span></p>
+    </div>
+    <p style="margin-top:16px; color:#888; font-style:italic;">Insurance companies post job listings that literally say "RN required" or "nursing background preferred." Heidi has 15+ years clinical experience AND a Masters. She's not competing with random PIs — she's in a specialized lane where the supply of qualified people is tiny and the demand is constant.</p>
+    <p class="source">Source: <a href="https://careers.elevancehealth.com/clinical-fraud-investigator-ii-registered-nurse-and-cpc-carelon-payment-integrity-siu/job/AEE802F4799056876086AADE16ED34D2">Elevance Health — Clinical Fraud Investigator (RN)</a> |
+    <a href="https://www.ziprecruiter.com/Jobs/Siu-Medical-Fraud-Investigator">ZipRecruiter — SIU Medical Fraud Investigator</a></p>
+  </div>
+
+  <h3>The Money Math — What Heidi Could Realistically Earn</h3>
+  <table class="compare-table">
+    <tr>
+      <th>Work Type</th>
+      <th>Per-Case Pay (Agency)</th>
+      <th>Cases/Week</th>
+      <th>Weekly Income</th>
+    </tr>
+    <tr>
+      <td class="label">Background checks</td>
+      <td>$150-400</td>
+      <td>5-8</td>
+      <td class="good">$750-3,200</td>
+    </tr>
+    <tr>
+      <td class="label">Skip traces</td>
+      <td>$150-500</td>
+      <td>3-5</td>
+      <td class="good">$450-2,500</td>
+    </tr>
+    <tr>
+      <td class="label">SIU medical review</td>
+      <td>$75-150/hr (4-10 hrs)</td>
+      <td>2-3</td>
+      <td class="good">$600-4,500</td>
+    </tr>
+    <tr>
+      <td class="label">Process serving</td>
+      <td>$40-75/serve</td>
+      <td>10-20</td>
+      <td class="good">$400-1,500</td>
+    </tr>
+  </table>
+
+  <table class="compare-table" style="margin-top:24px;">
+    <tr>
+      <th>Stage</th>
+      <th>Monthly Income</th>
+    </tr>
+    <tr>
+      <td class="label">Early months (agency, part-time, learning)</td>
+      <td>$2,000-4,000/month</td>
+    </tr>
+    <tr>
+      <td class="label">After 6-12 months with SIU/medical niche</td>
+      <td class="good">$6,000-12,000/month</td>
+    </tr>
+    <tr>
+      <td class="label">Combined with LNC ($125-200/hr)</td>
+      <td class="good">Matches or exceeds nursing income</td>
+    </tr>
+  </table>
+  <p style="margin-top:16px;">The key: <span class="highlight">SIU + medical expertise is the multiplier.</span> A generic background check PI makes $50-75K. A PI who can read medical records and spot fraud makes $100-150K+ because insurance companies pay a premium for that skill set and there aren't enough people who have it.</p>
+  <p class="source">Sources: <a href="https://policeofficer.org/private-investigator-salary/">PI Salary 2026</a> |
+  <a href="https://wifitalents.com/private-investigator-industry-statistics/">PI Industry Statistics</a> |
+  <a href="https://www.bls.gov/ooh/protective-service/private-detectives-and-investigators.htm">BLS — Private Investigators</a></p>
+
+  <h3>Where the Work Happens</h3>
+  <table class="compare-table">
+    <tr>
+      <th>Task</th>
+      <th>Location</th>
+      <th>% of Time</th>
+    </tr>
+    <tr>
+      <td>Skip tracing & OSINT research</td>
+      <td class="good">Home — desk</td>
+      <td>30%</td>
+    </tr>
+    <tr>
+      <td>Background research & records</td>
+      <td class="good">Home — desk</td>
+      <td>20%</td>
+    </tr>
+    <tr>
+      <td>Report writing</td>
+      <td class="good">Home — desk</td>
+      <td>15%</td>
+    </tr>
+    <tr>
+      <td>Attorney calls & meetings</td>
+      <td class="good">Home — virtual</td>
+      <td>10%</td>
+    </tr>
+    <tr>
+      <td>Process serving & field visits</td>
+      <td>In-person — local area</td>
+      <td>15%</td>
+    </tr>
+    <tr>
+      <td>Court / depositions</td>
+      <td>In-person — occasional</td>
+      <td>5%</td>
+    </tr>
+    <tr>
+      <td>Surveillance</td>
+      <td>In-person — rare for this niche</td>
+      <td>5%</td>
+    </tr>
+  </table>
+</section>
+
+<div class="divider"></div>
+
+<!-- ========== DAILY LIFE ========== -->
+<section>
+  <h2>A Day in <span>Heidi's</span> New Life</h2>
+
+  <table class="compare-table">
+    <tr>
+      <th>Now (Nursing)</th>
+      <th>PI Life</th>
+    </tr>
+    <tr>
+      <td class="bad">14 twelve-hour shifts/month</td>
+      <td class="good">25-35 hours/week, her schedule</td>
+    </tr>
+    <tr>
+      <td class="bad">Someone else decides when she works</td>
+      <td class="good">She picks her own hours</td>
+    </tr>
+    <tr>
+      <td class="bad">High stress, high stakes, burnout</td>
+      <td class="good">Research and puzzle-solving — the work she loves</td>
+    </tr>
+    <tr>
+      <td class="bad">Misses games, practices, dinners</td>
+      <td class="good">Done by 3 PM most days</td>
+    </tr>
+    <tr>
+      <td class="bad">$150-180K but at what cost</td>
+      <td class="good">$100-175K+ as she builds, on her terms</td>
+    </tr>
+  </table>
+
+  <h3>Typical Day</h3>
+  <table class="compare-table">
+    <tr><td class="label">7:30 AM</td><td>Coffee. Check case queue and new requests.</td></tr>
+    <tr><td class="label">8:00-11:00</td><td>Skip traces, background research, records review from home office.</td></tr>
+    <tr><td class="label">11:00 AM</td><td>Flexibility — errands, lunch, whatever she needs.</td></tr>
+    <tr><td class="label">12:00-2:00</td><td>Process serves or field tasks (2-3 days/week, not every day).</td></tr>
+    <tr><td class="label">3:00 PM</td><td>At the field. Practice. Games. Pickup. Present.</td></tr>
+    <tr><td class="label">Evening</td><td>Family time. Maybe 30 min of case notes if she wants.</td></tr>
+  </table>
+</section>
+
+<div class="divider"></div>
+
+<!-- ========== HOW TO GET WORK ========== -->
+<section>
+  <h2>How Work <span>Finds You</span></h2>
+  <p>You don't have to become marketers. You don't need a website, business cards, or a social media presence to start. Here's how PIs actually get work:</p>
+
+  <h3>Option A: Affiliate with an Existing Agency (Recommended to Start)</h3>
+  <p>This works <span class="highlight">exactly like real estate.</span> A real estate agent hangs their license with a brokerage — the brokerage has the clients, the reputation, and the deal flow. The agent picks which listings to take, works their own schedule, and splits the commission. PI agencies work the same way.</p>
+  <p style="margin-top:12px;">You affiliate as a <strong>1099 independent contractor</strong> — not a W-2 employee. The agency feeds you cases. <strong>You choose which ones to accept.</strong> You decline anything that doesn't fit your schedule. They handle client billing and intake, you do the investigation work, they take a cut (typically 30-40%). No set hours, no shifts, no boss breathing down your neck. This is <em>not</em> another job — it's a case pipeline you tap into when you're available.</p>
+
+  <p><span class="highlight">Agencies actively hiring in the Seattle/Tacoma area right now:</span></p>
+  <ul class="tasks">
+    <li><strong>ICS (International Counterintelligence Services)</strong> — national firm, employs subcontractors in WA. <span class="source"><a href="https://www.icsworld.com/Find_Local_Private_Investigator/Washington.aspx">icsworld.com</a></span></li>
+    <li><strong>DigiStream Investigations</strong> — hiring investigators in Seattle/Tacoma/Everett region. <span class="source"><a href="https://www.indeed.com/q-Private-Investigator-l-Washington-State-jobs.html">Indeed.com</a></span></li>
+    <li><strong>CoventBridge Group</strong> — Seattle area, pays for your licensing fees. <span class="source"><a href="https://www.glassdoor.com/Job/washington-state-private-investigator-jobs-SRCH_IL.0,16_IS3020_KO17,37.htm">Glassdoor</a></span></li>
+    <li><strong>Lemieux & Associates</strong> — hiring SIU field investigators in Tacoma, part-time. <span class="source"><a href="https://www.glassdoor.com/Job/washington-state-private-investigator-jobs-SRCH_IL.0,16_IS3020_KO17,37.htm">Glassdoor</a></span></li>
+  </ul>
+
+  <h3>Option B: Process Serving Companies (Immediate Income)</h3>
+  <p>Process serving companies always need people. Sign up as an independent contractor, pick up serves in your area. No experience needed, work when you want.</p>
+  <ul class="tasks">
+    <li><strong>ABC Legal</strong> — Seattle-based, largest process serving company in the US. Sign up as independent contractor, 1099 work, set your own schedule. <span class="source"><a href="https://www.abclegal.com/serve">abclegal.com/serve</a></span></li>
+    <li><strong>ServeNow</strong> — National network. Register as a server in WA, get overflow work. <span class="source"><a href="https://www.serve-now.com/resources/become-process-server/washington">serve-now.com</a></span></li>
+  </ul>
+  <p class="footnote">WA requirement: Register with the auditor of your county to serve process.</p>
+
+  <h3>Option C: Investigation Networks (Cases Come to You)</h3>
+  <p>Once licensed, list yourself on investigation referral networks. Attorneys and companies search these when they need a PI in your area.</p>
+  <ul class="tasks">
+    <li><strong>PInow.com</strong> — the largest PI referral network. Attorneys, insurance companies, and corporations search by location. You get phone and email leads. <span class="source"><a href="https://www.pinow.com/join/network">pinow.com</a></span></li>
+    <li><strong>NALI</strong> — National Association of Legal Investigators. Professional network, attorney referrals.</li>
+    <li><strong>Insurance SIU Panels</strong> — Insurance companies maintain approved vendor lists of PIs. Get on the list, cases come automatically.</li>
+  </ul>
+
+  <p style="margin-top:24px;"><span class="highlight">The bottom line:</span> Affiliate with an agency as a 1099 contractor. No marketing. No website. No cold calls. No set schedule. No boss. They have the clients — you pick the cases that fit your week. Your reputation builds on results, not on self-promotion.</p>
+</section>
+
+<div class="divider"></div>
+
+<!-- ========== THE MONEY ========== -->
+<section>
+  <h2>The <span>Money</span></h2>
+
+  <table class="compare-table">
+    <tr>
+      <th>Role</th>
+      <th>WA Income Range</th>
+      <th>Source</th>
+    </tr>
+    <tr>
+      <td class="label">Nurse Practitioner (current)</td>
+      <td>$150,000-$180,000</td>
+      <td><a href="https://www.bls.gov/ooh/healthcare/nurse-anesthetists-nurse-midwives-and-nurse-practitioners.htm" style="color:#555;">BLS</a></td>
+    </tr>
+    <tr>
+      <td class="label">PI Contractor (agency affiliate, starting)</td>
+      <td>$52,000-$63,000</td>
+      <td><a href="https://www.salary.com/research/salary/alternate/private-investigator-salary/wa" style="color:#555;">Salary.com</a></td>
+    </tr>
+    <tr>
+      <td class="label">PI Experienced (WA avg)</td>
+      <td>$78,320</td>
+      <td><a href="https://privateinvestigatoredu.org/washington/" style="color:#555;">BLS via PI Edu</a></td>
+    </tr>
+    <tr>
+      <td class="label">PI Top 10% in WA</td>
+      <td>$104,240+</td>
+      <td><a href="https://privateinvestigatoredu.org/washington/" style="color:#555;">BLS via PI Edu</a></td>
+    </tr>
+    <tr>
+      <td class="label">Legal Nurse Consultant (independent)</td>
+      <td>$125-$200/hour</td>
+      <td><a href="https://www.registerednursing.org/specialty/legal-nurse-consultant/" style="color:#555;">RegisteredNursing.org</a></td>
+    </tr>
+    <tr>
+      <td class="label">Expert Witness Testimony</td>
+      <td>$300-$500/hour</td>
+      <td><a href="https://www.legalnurse.com/certified-legal-nurse-consultants/clnc-consultant-stories/i-am-living-my-passion-in-tennessee-making-175000-this-year-as-a-certified-legal-nurse-consultant" style="color:#555;">LegalNurse.com</a></td>
+    </tr>
+  </table>
+
+  <p style="margin-top:24px;">Starting under an agency, the pay is significantly lower than $150-180K nursing income. <span class="highlight">This is a side hustle first — not a pay cut.</span> Heidi keeps her nursing shifts. Daniel does the heavy lifting on setup. The PI income grows alongside, not instead of, nursing income. She doesn't leave nursing until PI + LNC income matches or exceeds it.</p>
+
+  <p>The real money comes when she combines her PI license with her medical expertise — insurance companies and attorneys pay significantly more for a PI who can also interpret medical records and testify as an expert.</p>
+
+  <div class="income-callout">
+    <p class="context">Washington State — PI + Medical Expertise Combined</p>
+    <p class="amount">$100K-$175K+</p>
+    <p class="context">Annual potential once established, working 25-30 hours/week from home</p>
+    <p class="footnote">Based on WA top-10% PI salary ($104K) + LNC consulting rates ($125-200/hr) for medical-legal cases. Individual results depend on caseload and specialization.</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ========== THE PLAN ========== -->
+<section>
+  <h2>The <span>Plan</span></h2>
+  <p>No fake timelines. Move at your pace. Each phase has a clear milestone — you know you're ready for the next step when you hit it.</p>
+
+  <div class="phase">
+    <div class="phase-tag">Phase 1 — Get Licensed & Start Learning</div>
+    <h3>Lay the Foundation</h3>
+    <ul class="tasks">
+      <li>Both Daniel and Heidi apply for WA unarmed PI license ($200 each)</li>
+      <li>Complete the 4-hour pre-assignment training course</li>
+      <li>Pass background check (fingerprints)</li>
+      <li>Heidi registers as process server in Pierce County</li>
+      <li>Sign up with ABC Legal and/or ServeNow as independent contractor</li>
+      <li>Apply to 2-3 PI agencies in Tacoma/Seattle area (ICS, DigiStream, CoventBridge)</li>
+      <li>Daniel begins building case management system</li>
+    </ul>
+    <p><span class="highlight">Heidi keeps all nursing shifts.</span> Daniel does the applications, research, and tech setup.</p>
+    <div class="milestone">
+      <strong>You're ready for Phase 2 when:</strong>
+      <p>Both licenses are in hand, and Heidi has either affiliated with an agency as a 1099 contractor or is picking up process serves.</p>
+    </div>
+  </div>
+
+  <div class="phase phase-2">
+    <div class="phase-tag">Phase 2 — First Cases & First Income</div>
+    <h3>Start Working Cases</h3>
+    <ul class="tasks">
+      <li>Accept agency cases that fit your schedule — skip traces, background checks, insurance cases</li>
+      <li>Process serving on flexible days (between or around nursing shifts)</li>
+      <li>Learn the databases, tools, and report formats used in the industry</li>
+      <li>Daniel builds OSINT research tools and report templates</li>
+      <li>Track every hour, every case, every dollar — know the real numbers</li>
+      <li>List on PInow.com once you have a few cases under your belt</li>
+    </ul>
+    <p><span class="highlight">Heidi still works nursing.</span> PI work fills gaps in the schedule — evenings, days off, weekends she chooses.</p>
+    <div class="milestone">
+      <strong>You're ready for Phase 3 when:</strong>
+      <p>PI side income consistently hits $2,000-3,000/month and Heidi has completed 20+ cases.</p>
+    </div>
+  </div>
+
+  <div class="phase phase-3">
+    <div class="phase-tag">Phase 3 — Reduce Nursing, Grow PI</div>
+    <h3>The Shift</h3>
+    <ul class="tasks">
+      <li>Heidi drops to minimum nursing shifts (per diem / as-needed)</li>
+      <li>Take on more complex cases — insurance fraud, workers comp, domestic</li>
+      <li>Add Legal Nurse Consultant work — medical record reviews for attorneys ($125-200/hr)</li>
+      <li>Build relationships with 3-5 regular attorney clients</li>
+      <li>Get on insurance company SIU vendor panels</li>
+      <li>Daniel launches client portal and automated billing</li>
+    </ul>
+    <p><span class="highlight">Nursing becomes the backup, not the main job.</span> PI + LNC income approaching or exceeding nursing pay.</p>
+    <div class="milestone">
+      <strong>You're ready for Phase 4 when:</strong>
+      <p>PI + LNC income replaces nursing income, and you have steady repeat clients.</p>
+    </div>
+  </div>
+
+  <div class="phase phase-4">
+    <div class="phase-tag">Phase 4 — Grande Investigations</div>
+    <h3>Your Own Agency</h3>
+    <ul class="tasks">
+      <li>Apply for WA Private Investigative Agency license</li>
+      <li>Heidi leaves nursing (or keeps per diem for fun, not need)</li>
+      <li>Take direct client work — no agency cut</li>
+      <li>Expert witness testimony for medical-legal cases ($300-500/hr)</li>
+      <li>Hire subcontractors for overflow or surveillance work</li>
+      <li>Daniel's tech platform becomes a sellable product to other PIs</li>
+    </ul>
+    <div class="milestone">
+      <strong>The goal:</strong>
+      <p>Heidi works 25-30 hours a week. From home. On her schedule. At every game, every practice, every dinner. Making equal or more than nursing ever paid.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ========== HONEST LOOK ========== -->
+<section>
+  <h2>The <span>Honest</span> Look</h2>
+  <p>No sugarcoating. Here's the real picture.</p>
+
+  <div class="pros-cons">
+    <div class="col pro">
+      <h4>Why This Works</h4>
+      <ul>
+        <li>She's home. 75% of the work is from a desk.</li>
+        <li>WA is #1 in the nation for PI pay.</li>
+        <li>No experience required for WA license.</li>
+        <li>She already loves the research — the eviction case proved it.</li>
+        <li>Her medical background commands premium rates.</li>
+        <li>$200 to start. Not $30K.</li>
+        <li>Daniel builds the tech — most PIs use paper and spreadsheets.</li>
+        <li>Doesn't require quitting nursing. It's additive until it replaces.</li>
+        <li>Recession-proof — people always sue, cheat, and disappear.</li>
+        <li>Together you're a complete firm — investigator + tech.</li>
+      </ul>
+    </div>
+    <div class="col con">
+      <h4>What To Know</h4>
+      <ul>
+        <li>Starting pay under an agency is less than nursing.</li>
+        <li>Income is irregular at first — feast or famine until pipeline is steady.</li>
+        <li>Self-employed = own health insurance (may already have through Daniel).</li>
+        <li>Not 100% remote — some field work, some court appearances.</li>
+        <li>Client trust takes time to build with attorneys.</li>
+        <li>Must affiliate under an agency license at first (1099 contractor — you pick your cases, not a job).</li>
+        <li>Student loans still due during the transition.</li>
+        <li>Some cases involve uncomfortable subjects (fraud, infidelity, custody).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Risk Mitigation</h3>
+  <ul class="tasks">
+    <li>Heidi does not quit nursing until PI income is proven and consistent.</li>
+    <li>Nursing stays available as per diem — she can always pick up shifts.</li>
+    <li>Daniel's two jobs provide household stability during the ramp.</li>
+    <li>Student loans stay on income-driven repayment if needed during transition.</li>
+    <li>Total startup investment: $400 (two licenses) + time. Not thousands.</li>
+  </ul>
+</section>
+
+<div class="divider"></div>
+
+<!-- ========== CTA ========== -->
+<div class="cta-section">
+  <h2>Every Game. Every Practice.<br><span style="color:#dc2626;">Every Dinner.</span></h2>
+  <p>This isn't about becoming a private investigator. It's about building a life where you're present for the things that matter — and getting paid well to do work you actually love.</p>
+  <p style="color:#555; font-size:0.9rem; margin-top:40px;">
+    All salary data from Bureau of Labor Statistics, Salary.com, and ZipRecruiter (2025-2026).<br>
+    Licensing requirements from Washington State Department of Licensing (RCW 18.165).<br>
+    No projections. No guarantees. Just facts, a plan, and two people who don't quit.
+  </p>
+</div>
+
+</body>
+</html>
