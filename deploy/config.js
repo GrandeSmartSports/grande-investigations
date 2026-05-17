@@ -4,7 +4,7 @@ const CONFIG = (() => {
     return { API: 'http://localhost:8000' };
   }
   // Production — update with Railway URL after deploy
-  return { API: 'https://grande-investigations-api.up.railway.app' };
+  return { API: 'https://grande-investigations-production.up.railway.app' };
 })();
 
 async function api(path, opts = {}) {
