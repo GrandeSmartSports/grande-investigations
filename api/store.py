@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+from typing import Optional
 
 DATA_DIR = Path(__file__).parent.parent / "data"
 DATA_DIR.mkdir(exist_ok=True)
@@ -21,7 +22,7 @@ def save(collection: str, data: list[dict]):
     _file(collection).write_text(json.dumps(data, indent=2))
 
 
-def find(collection: str, id: str) -> dict | None:
+def find(collection: str, id: str) -> Optional[dict]:
     for item in load(collection):
         if item.get("id") == id:
             return item
